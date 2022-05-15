@@ -60,6 +60,7 @@ def main():
     search_entry = tkinter.Entry(app, textvariable=g_search_str, width=10)
     search_entry.pack()
     search_entry.bind('<Return>', cb_search)
+    search_entry.focus_set()
 
     g_listbox = tkinter.Listbox(app)
     win32gui.EnumWindows( winEnumHandler, g_list )
