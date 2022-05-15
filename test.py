@@ -1,38 +1,40 @@
-ws = Tk()
-Frm = Frame(ws)
-Label(Frm,text='Enter Word to Find:').pack(side=LEFT)
-modify = Entry(Frm)
+from tkinter import *
+ 
+def cb_search(event):
+     
+    sstr=search_str.get()
+    listbox.delete(0,END)
+    #If filter removed show all data
+    if sstr=="":
+        fill_listbox(main_data) 
+        return
+ 
+    filtered_data=list()
+    for item in main_data:
+        if item.find(sstr)>=0:
+            filtered_data.append(item)
+  
+    fill_listbox(filtered_data)   
+ 
+def fill_listbox(ld):
+    for item in ld:
+        listbox.insert(END, item)
+ 
+ 
+main_data= ["one","two", "three","twenty two"]
+ 
+#GUI
+master = Tk()
 
-modify.pack(side=LEFT, fill=BOTH, expand=1)
 
-modify.focus_set()
-
-buttn = Button(Frm, text='Find')
-buttn.pack(side=RIGHT)
-Frm.pack(side=TOP)
-
-txt = Text(ws)
-
-txt.insert('1.0','''Enter here...''')
-txt.pack(side=BOTTOM)
+search_str = StringVar()
+search = Entry(master, textvariable=search_str, width=10)
+search.pack()
+search.bind('<Return>', cb_search)
 
 
-def find():
-	
-	txt.tag_remove('found', '1.0', END)
-	ser = modify.get()
-	if ser:
-		idx = '1.0'
-		while 1:
-			idx = txt.search(ser, idx, nocase=1,
-							stopindex=END)
-			if not idx: break
-			lastidx = '%s+%dc' % (idx, len(ser))
-			
-			txt.tag_add('found', idx, lastidx)
-			idx = lastidx
-		txt.tag_config('found', foreground='blue')
-	modify.focus_set()
-buttn.config(command=find)
+listbox = Listbox(master)
+listbox.pack()
+fill_listbox(main_data)
 
-ws.mainloop()
+mainloop()
