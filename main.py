@@ -3,55 +3,54 @@ import pyautogui
 import tkinter
 
 
-g_list = []
+g_hwnd_title_list = []
+g_filtered_data = []
 g_search_str = None
 g_listbox = None
 
 
 def winEnumHandler( hwnd, ctx ):
-    global g_list
+    global g_hwnd_title_list
     if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd) != '':
-        g_list.append(win32gui.GetWindowText(hwnd))
+        g_hwnd_title_list.append((hwnd, win32gui.GetWindowText(hwnd)))
+        g_filtered_data.append((hwnd, win32gui.GetWindowText(hwnd)))
         # x = input()
-        # win32gui.ShowWindow(hwnd, 5)
-        # win32gui.SetForegroundWindow(hwnd)
-        # pyautogui.press("alt")
 
-def callback(event):
-    print("You pressed Enter")
-    print(event)
+def enter_callback(event):
+    global g_listbox, g_filtered_data, g_hwnd_title_list
+    win32gui.ShowWindow(g_filtered_data[g_listbox.curselection()[0]][0], 5)
+    pyautogui.press("alt")
+    win32gui.SetForegroundWindow(g_filtered_data[g_listbox.curselection()[0]][0])
+    exit()
 
 def cb_searchx(*args):
-    global g_listbox
-    global g_search_str
+    global g_listbox, g_search_str, g_filtered_data
     
     sstr=g_search_str.get()
     g_listbox.delete(0,tkinter.END)
     #If filter removed show all data
     if sstr=="":
-        fill_listbox(g_list) 
+        fill_listbox(g_hwnd_title_list) 
         if g_listbox.size():
             g_listbox.select_set(0)
         return
  
-    filtered_data=list()
-    print("hi")
-    print(g_listbox)
-    for item in g_list:
+    g_filtered_data=list()
+    for item in g_hwnd_title_list:
         print(f"hi search {item}")
         if item.lower().find(sstr.lower())>=0:
-            filtered_data.append(item)
+            g_filtered_data.append(item)
   
-    fill_listbox(filtered_data)
+    fill_listbox(g_filtered_data)
     
     if g_listbox.size():
             g_listbox.select_set(0)
 
 
-def fill_listbox(ld):
+def fill_listbox(hwnd_title_list):
     global g_listbox
-    for item in ld:
-        g_listbox.insert(tkinter.END, item)
+    for hwnd_title_tuple_item in hwnd_title_list:
+        g_listbox.insert(tkinter.END, hwnd_title_tuple_item[1])
 
 
 def on_entry_up_down(event):
@@ -69,10 +68,10 @@ def on_entry_up_down(event):
 
 
 def main():
-    global g_listbox, g_search_str
+    global g_listbox, g_search_str, g_hwnd_title_list, g_filtered_data
     
     app = tkinter.Tk()
-    #app.bind('<Return>', callback)
+    app.bind('<Return>', enter_callback)
 
     g_search_str = tkinter.StringVar()
     g_search_str.trace("w", cb_searchx)
@@ -82,10 +81,10 @@ def main():
     search_entry.focus_set()
 
     g_listbox = tkinter.Listbox(app)
-    win32gui.EnumWindows( winEnumHandler, g_list )
-    fill_listbox(g_list)
+    win32gui.EnumWindows( winEnumHandler, g_hwnd_title_list )
+    fill_listbox(g_hwnd_title_list)
     g_listbox.pack()
-    if g_list:
+    if g_hwnd_title_list:
         g_listbox.select_set(0)
     app.bind("<Down>", on_entry_up_down)
     app.bind("<Up>", on_entry_up_down)
