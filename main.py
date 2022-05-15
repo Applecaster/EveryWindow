@@ -30,6 +30,8 @@ def cb_searchx(*args):
     #If filter removed show all data
     if sstr=="":
         fill_listbox(g_list) 
+        if g_listbox.size():
+            g_listbox.select_set(0)
         return
  
     filtered_data=list()
@@ -40,13 +42,30 @@ def cb_searchx(*args):
         if item.lower().find(sstr.lower())>=0:
             filtered_data.append(item)
   
-    fill_listbox(filtered_data)  
+    fill_listbox(filtered_data)
+    
+    if g_listbox.size():
+            g_listbox.select_set(0)
 
 
 def fill_listbox(ld):
     global g_listbox
     for item in ld:
         g_listbox.insert(tkinter.END, item)
+
+
+def on_entry_up_down(event):
+    selection = g_listbox.curselection()[0]
+    
+    if event.keysym == 'Up':
+        selection += -1
+
+    if event.keysym == 'Down':
+        selection += 1
+
+    if 0 <= selection < g_listbox.size():
+        g_listbox.selection_clear(0, tkinter.END)
+        g_listbox.select_set(selection)
 
 
 def main():
@@ -66,6 +85,10 @@ def main():
     win32gui.EnumWindows( winEnumHandler, g_list )
     fill_listbox(g_list)
     g_listbox.pack()
+    if g_list:
+        g_listbox.select_set(0)
+    app.bind("<Down>", on_entry_up_down)
+    app.bind("<Up>", on_entry_up_down)
     
     app.mainloop()
 
