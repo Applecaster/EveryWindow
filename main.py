@@ -38,7 +38,7 @@ def cb_searchx(*args):
     g_filtered_data=list()
     for item in g_hwnd_title_list:
         print(f"hi search {item}")
-        if item.lower().find(sstr.lower())>=0:
+        if item[1].lower().find(sstr.lower())>=0:
             g_filtered_data.append(item)
   
     fill_listbox(g_filtered_data)
@@ -67,6 +67,13 @@ def on_entry_up_down(event):
         g_listbox.select_set(selection)
 
 
+def entry_ctrl_bs(event):
+    ent = event.widget
+    end_idx = ent.index(tkinter.INSERT)
+    start_idx = ent.get().rfind(" ", None, end_idx)
+    ent.selection_range(start_idx, end_idx)
+    
+
 def main():
     global g_listbox, g_search_str, g_hwnd_title_list, g_filtered_data
     
@@ -78,6 +85,7 @@ def main():
     
     search_entry = tkinter.Entry(app, textvariable=g_search_str, width=10)
     search_entry.pack()
+    search_entry.bind('<Control-BackSpace>', entry_ctrl_bs)
     search_entry.focus_set()
 
     g_listbox = tkinter.Listbox(app)
