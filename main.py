@@ -7,6 +7,7 @@ g_hwnd_title_list = []
 g_filtered_data = []
 g_search_str = None
 g_listbox = None
+g_app = None
 
 
 def winEnumHandler( hwnd, ctx ):
@@ -17,11 +18,11 @@ def winEnumHandler( hwnd, ctx ):
         # x = input()
 
 def enter_callback(event):
-    global g_listbox, g_filtered_data, g_hwnd_title_list
+    global g_listbox, g_filtered_data, g_hwnd_title_list, g_app
     win32gui.ShowWindow(g_filtered_data[g_listbox.curselection()[0]][0], 5)
     pyautogui.press("alt")
     win32gui.SetForegroundWindow(g_filtered_data[g_listbox.curselection()[0]][0])
-    exit()
+    g_app.destroy()
 
 def cb_searchx(*args):
     global g_listbox, g_search_str, g_filtered_data
@@ -75,29 +76,39 @@ def entry_ctrl_bs(event):
     
 
 def main():
-    global g_listbox, g_search_str, g_hwnd_title_list, g_filtered_data
+    global g_listbox, g_search_str, g_hwnd_title_list, g_filtered_data, g_app
     
-    app = tkinter.Tk()
-    app.bind('<Return>', enter_callback)
+    while True:
+        g_hwnd_title_list = []
+        g_filtered_data = []
+        g_search_str = None
+        g_listbox = None
+        g_app = None
+        
+        g_app = tkinter.Tk()
+        g_app.bind('<Return>', enter_callback)
 
-    g_search_str = tkinter.StringVar()
-    g_search_str.trace("w", cb_searchx)
-    
-    search_entry = tkinter.Entry(app, textvariable=g_search_str, width=10)
-    search_entry.pack()
-    search_entry.bind('<Control-BackSpace>', entry_ctrl_bs)
-    search_entry.focus_set()
+        g_search_str = tkinter.StringVar()
+        g_search_str.trace("w", cb_searchx)
+        
+        search_entry = tkinter.Entry(g_app, textvariable=g_search_str, width=10)
+        search_entry.pack()
+        search_entry.bind('<Control-BackSpace>', entry_ctrl_bs)
+        search_entry.focus_set()
 
-    g_listbox = tkinter.Listbox(app)
-    win32gui.EnumWindows( winEnumHandler, g_hwnd_title_list )
-    fill_listbox(g_hwnd_title_list)
-    g_listbox.pack()
-    if g_hwnd_title_list:
-        g_listbox.select_set(0)
-    app.bind("<Down>", on_entry_up_down)
-    app.bind("<Up>", on_entry_up_down)
-    
-    app.mainloop()
+        g_listbox = tkinter.Listbox(g_app)
+        win32gui.EnumWindows( winEnumHandler, g_hwnd_title_list )
+        fill_listbox(g_hwnd_title_list)
+        g_listbox.pack()
+        if g_hwnd_title_list:
+            g_listbox.select_set(0)
+        g_app.bind("<Down>", on_entry_up_down)
+        g_app.bind("<Up>", on_entry_up_down)
+        
+        g_app.mainloop()
+        
+        print("exited cleanly :)")
+        input("Press enter to run again")
 
 
 if __name__ == "__main__":
