@@ -1,40 +1,34 @@
-from tkinter import *
- 
-def cb_search(event):
-     
-    sstr=search_str.get()
-    listbox.delete(0,END)
-    #If filter removed show all data
-    if sstr=="":
-        fill_listbox(main_data) 
-        return
- 
-    filtered_data=list()
-    for item in main_data:
-        if item.find(sstr)>=0:
-            filtered_data.append(item)
-  
-    fill_listbox(filtered_data)   
- 
-def fill_listbox(ld):
-    for item in ld:
-        listbox.insert(END, item)
- 
- 
-main_data= ["one","two", "three","twenty two"]
- 
-#GUI
-master = Tk()
+# Import the required libraries
+import tkinter
+import pystray
+from PIL import Image, ImageTk
 
+# Create an instance of tkinter frame or window
+win=tkinter.Tk()
+win.title("System Tray Application")
 
-search_str = StringVar()
-search = Entry(master, textvariable=search_str, width=10)
-search.pack()
-search.bind('<Return>', cb_search)
+# Set the size of the window
+win.geometry("700x350")
 
+# Define a function for quit the window
+def quit_window(icon, item):
+   icon.stop()
+   win.destroy()
 
-listbox = Listbox(master)
-listbox.pack()
-fill_listbox(main_data)
+# Define a function to show the window again
+def show_window(icon, item):
+   icon.stop()
+   win.after(0,win.deiconify())
 
-mainloop()
+# Hide the window and show on the system taskbar
+def hide_window():
+   win.withdraw()
+   print("hiii")
+   image=Image.open("image.ico")
+   menu=(pystray.MenuItem('Quit', quit_window), pystray.MenuItem('Show', show_window))
+   icon=pystray.Icon("name", image, "title", menu)
+   icon.run()
+
+win.protocol('WM_DELETE_WINDOW', hide_window)
+
+win.mainloop()
