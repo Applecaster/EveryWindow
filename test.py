@@ -38,23 +38,22 @@ def show_window(icon, item):
 # Hide the window and show on the system taskbar
 def hide_window():
    print("hide window")
-   global win, g_icon
-   win.withdraw()
-   print("hiii")
-   image=Image.open("image.ico")
-   quit_window_item = pystray.MenuItem('Quit', quit_window)
-   show_window_item = pystray.MenuItem('Show', show_window, default=True)
-   menu=(show_window_item, quit_window_item)
-   g_icon=pystray.Icon("name", image, "title", menu)
-   g_icon.run()
+   global win, g_icon, g_window_hidden
+   if not g_window_hidden:
+      g_window_hidden = True
+      print("hiii")
+      win.withdraw()
+      image=Image.open("image.ico")
+      quit_window_item = pystray.MenuItem('Quit', quit_window)
+      show_window_item = pystray.MenuItem('Show', show_window, default=True)
+      menu=(show_window_item, quit_window_item)
+      g_icon=pystray.Icon("name", image, "title", menu)
+      g_icon.run()
 
 
 def hide_window2(event):
    print("hide window 2")
-   global g_window_hidden
-   if not g_window_hidden:
-      g_window_hidden = True
-      hide_window()
+   hide_window()
    #threading.Thread(target=hide_window,args=()).start()
 
 win.protocol('WM_DELETE_WINDOW', hide_window)
