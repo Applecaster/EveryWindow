@@ -4,45 +4,35 @@ import pystray
 from PIL import Image, ImageTk
 import threading
 
-g_dostuff = True
 g_icon = None
-g_should_quit = False
 g_window_hidden = False
-#g_exit_event = threading.Event()
 
 # Create an instance of tkinter frame or window
-win=tkinter.Tk()
-win.title("System Tray Application")
+g_app=tkinter.Tk()
+g_app.title("System Tray Application")
 
 # Set the size of the window
-win.geometry("700x350")
+g_app.geometry("700x350")
 
 # Define a function for quit the window
 def quit_window(icon, item):
-   print("quit window")
-   global g_dostuff, win, g_icon, g_should_quit
-   g_dostuff = False
+   global g_app, g_icon
    g_icon.stop()
-   #win.after(0,win.deiconify())
-   win.destroy()
+   g_app.destroy()
 
 # Define a function to show the window again
 def show_window(icon, item):
-   print("show window")
-   global win, g_icon, g_window_hidden
+   global g_app, g_icon, g_window_hidden
    g_window_hidden = False
    g_icon.stop()
-   win.after(0,win.deiconify())
-      
+   g_app.after(0,g_app.deiconify())
       
 # Hide the window and show on the system taskbar
 def hide_window():
-   print("hide window")
-   global win, g_icon, g_window_hidden
+   global g_app, g_icon, g_window_hidden
    if not g_window_hidden:
       g_window_hidden = True
-      print("hiii")
-      win.withdraw()
+      g_app.withdraw()
       image=Image.open("image.ico")
       quit_window_item = pystray.MenuItem('Quit', quit_window)
       show_window_item = pystray.MenuItem('Show', show_window, default=True)
@@ -52,16 +42,14 @@ def hide_window():
 
 
 def hide_window2(event):
-   print("hide window 2")
    hide_window()
-   #threading.Thread(target=hide_window,args=()).start()
 
-win.protocol('WM_DELETE_WINDOW', hide_window)
-win.bind('<Unmap>', hide_window2)
+g_app.protocol('WM_DELETE_WINDOW', hide_window)
+g_app.bind('<Unmap>', hide_window2)
 
 #win.attributes('-toolwindow', 1)
 
-win.mainloop()
+g_app.mainloop()
 
 print("waiting for input")
 input("...")

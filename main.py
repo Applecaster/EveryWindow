@@ -1,6 +1,8 @@
 import win32gui
 import pyautogui
 import tkinter
+import pystray
+import PIL
 
 
 g_hwnd_title_list = []
@@ -8,7 +10,8 @@ g_filtered_data = []
 g_search_str = None
 g_listbox = None
 g_app = None
-
+g_icon = None
+g_window_hidden = False
 
 def winEnumHandler( hwnd, ctx ):
     global g_hwnd_title_list
@@ -74,9 +77,39 @@ def entry_ctrl_bs(event):
     start_idx = ent.get().rfind(" ", None, end_idx)
     ent.selection_range(start_idx, end_idx)
     
+# Define a function for quit the window
+def quit_window(icon, item):
+   global g_app, g_icon
+   g_icon.stop()
+   g_app.destroy()
+
+# Define a function to show the window again
+def show_window(icon, item):
+   global g_app, g_icon, g_window_hidden
+   g_window_hidden = False
+   g_icon.stop()
+   g_app.after(0,g_app.deiconify())
+      
+# Hide the window and show on the system taskbar
+def hide_window():
+   global g_app, g_icon, g_window_hidden
+   if not g_window_hidden:
+      g_window_hidden = True
+      g_app.withdraw()
+      image=PIL.Image.open("image.ico")
+      quit_window_item = pystray.MenuItem('Quit', quit_window)
+      show_window_item = pystray.MenuItem('Show', show_window, default=True)
+      menu=(show_window_item, quit_window_item)
+      g_icon=pystray.Icon("name", image, "title", menu)
+      g_icon.run()
+
+
+def hide_window2(event):
+   hide_window()
+
 
 def main():
-    global g_listbox, g_search_str, g_hwnd_title_list, g_filtered_data, g_app
+    global g_listbox, g_search_str, g_hwnd_title_list, g_filtered_data, g_app, g_icon, g_window_hidden
     
     while True:
         g_hwnd_title_list = []
@@ -104,6 +137,9 @@ def main():
             g_listbox.select_set(0)
         g_app.bind("<Down>", on_entry_up_down)
         g_app.bind("<Up>", on_entry_up_down)
+        
+        g_app.protocol('WM_DELETE_WINDOW', hide_window)
+        g_app.bind('<Unmap>', hide_window2)
         
         g_app.mainloop()
         
