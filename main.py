@@ -19,8 +19,8 @@ def winEnumHandler( hwnd, ctx ):
 
 def enter_callback(event):
     global g_listbox, g_filtered_data, g_hwnd_title_list, g_app
-    win32gui.ShowWindow(g_filtered_data[g_listbox.curselection()[0]][0], 5)
     pyautogui.press("alt")
+    win32gui.ShowWindow(g_filtered_data[g_listbox.curselection()[0]][0], 5)
     win32gui.SetForegroundWindow(g_filtered_data[g_listbox.curselection()[0]][0])
     g_app.destroy()
 
